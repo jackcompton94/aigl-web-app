@@ -1,0 +1,20 @@
+/* ServerResponse.css */
+
+.server-response {
+  text-align: left;
+  margin: 20px;
+}
+
+.formatted-response {
+  white-space: pre-line;
+  background-color: #2e3139;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
+  font-family: 'Courier New', monospace; /* Use a monospaced font for the terminal look */
+}
+
+.server-response p {
+  margin: 0;
+}

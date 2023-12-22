@@ -1,23 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import Header from './components/Header.js';
+import InputForm from './components/InputForm.js';
+import ServerResponse from './components/ServerResponse.js';
+import useSocket from './hooks/useSocket.js';
+import './styles/App.css';
+
+const ENDPOINT = 'https://gsi-server-256a7749499a.herokuapp.com/';
 
 function App() {
+  const { serverResponse, buttonClicked, handleConnect, handleDisconnect } = useSocket(ENDPOINT);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="center-container">
+      <Header />
+      <div className="App">
+        <InputForm
+          onConnectButtonClick={handleConnect}
+          onDisconnectButtonClick={handleDisconnect}
+          connectButtonDisabled={buttonClicked}
+          disconnectButtonDisabled={!buttonClicked}
+        />
+        <ServerResponse response={serverResponse} />
+      </div>
     </div>
   );
 }

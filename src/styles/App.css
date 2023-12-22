@@ -1,0 +1,26 @@
+body, html {
+    margin:  0;
+    padding: 0;
+  }
+  
+  .center-container {
+    position: relative;
+    color: #ffffff;
+    height: 100vh;
+    background: #141414;
+    font-family: 'Arial', sans-serif;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+  }
+  
+  /* Styles for the main App container */
+  .center-container .App {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    text-align: center; 
+  }
