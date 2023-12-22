@@ -78,3 +78,20 @@
     font-size: 14px;
     color: #121212;
   }
+
+  .findSteamId {
+    background-color: transparent;
+    color: white;
+    font-size: 0.9rem; /* Adjust the font size as needed */
+    text-decoration: none; /* Remove underline, assuming you want it to look like a link */
+    padding: 4px; /* Add padding for better visual appearance */
+    margin: 3px; /* Add margin for spacing */
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: color 0.3s ease-in-out;
+}
+
+.findSteamId:hover {
+    color: #ccc; /* Change color on hover */
+}

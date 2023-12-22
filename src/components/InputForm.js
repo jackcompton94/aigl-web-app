@@ -33,6 +33,10 @@ function InputForm({
     setSteamId('');
   };
 
+  const handleFindSteamIDButtonClick = () => {
+    console.log('find SteamID by doing this..')
+  }
+
   return (
     <div className="input-form">
       <div className="button-container">
@@ -53,6 +57,9 @@ function InputForm({
           Connect
         </button>
       </div>
+      <a href="#" onClick={handleFindSteamIDButtonClick} className="findSteamId">
+        How do I find my SteamID?
+      </a>
     </div>
   );
 }
