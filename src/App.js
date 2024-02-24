@@ -5,7 +5,8 @@ import ServerResponse from './components/ServerResponse.js';
 import useSocket from './hooks/useSocket.js';
 import './styles/App.css';
 
-const ENDPOINT = 'https://gsi-server-256a7749499a.herokuapp.com/';
+// const ENDPOINT = 'https://gsi-server-256a7749499a.herokuapp.com/';
+const ENDPOINT = 'http://127.0.0.1:8888';
 
 function App() {
   const { serverResponse, buttonClicked, handleConnect, handleDisconnect } = useSocket(ENDPOINT);

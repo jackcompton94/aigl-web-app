@@ -6,66 +6,66 @@ const useSocket = (endpoint) => {
   const [buttonClicked, setButtonClicked] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const steamIdRef = useRef('');
+  const socketRef = useRef(null);
 
   useEffect(() => {
     if (buttonClicked) {
-      const socket = io(endpoint);
+      // Create a new socket instance only if it doesn't exist
+      if (!socketRef.current) {
+        socketRef.current = io(endpoint);
 
-      // Event handler for when the connection is established
-      socket.on('connect', () => {
-        console.log('Connected to the server');
+        // Event handler for when the connection is established
+        socketRef.current.on('connect', () => {
+          console.log('Connected to the server');
+          socketRef.current.emit('connect_with_steamid', { steamid: steamIdRef.current });
+          setIsConnected(true);
+        });
 
-        // Emit the 'connect_with_steamid' event with the SteamID
-        socket.emit('connect_with_steamid', { steamid: steamIdRef.current });
-        setIsConnected(true);
-      });
+        // Event handler for the 'connected' event from the server
+        socketRef.current.on('connected', (data) => {
+          console.log('Server says:', data.message);
+          setServerResponse(data.message);
+        });
 
-      // Event handler for the 'connected' event from the server
-      socket.on('connected', (data) => {
-        console.log('Server says:', data.message);
-        setServerResponse(data.message);
-      });
+        // Event handler for 'game_state_update'
+        socketRef.current.on('game_state_update', (data) => {
+          console.log('Game state update:', data);
+          setServerResponse(data); 
+        });
 
-      // Event handler for 'game_state_update'
-      socket.on('game_state_update', (data) => {
-        console.log('Game state update:', data);
+        // Event handler for 'disconnect_with_steamid'
+        socketRef.current.on('disconnect_with_steamid', () => {
+          console.log('Disconnecting with SteamID');
+          setIsConnected(false);
+          // Perform any additional cleanup or actions if needed
+        });
 
-        // Update the serverResponse state with the 'game_state_update' data
-        setServerResponse(data); 
-      });
-
-      // Event handler for 'disconnect_with_steamid'
-      socket.on('disconnect_with_steamid', () => {
-        console.log('Disconnecting with SteamID');
-        setIsConnected(false);
-        // Perform any additional cleanup or actions if needed
-      });
-
-      // Event handler for when the connection is closed
-      socket.on('disconnect', () => {
-        console.log('Disconnected from the server');
-        setIsConnected(false);
-      });
+        // Event handler for when the connection is closed
+        socketRef.current.on('disconnect', () => {
+          console.log('Disconnected from the server');
+          setIsConnected(false);
+        });
+      }
 
       // Cleanup function to disconnect when the component unmounts
       return () => {
-        socket.disconnect();
+        if (socketRef.current) {
+          socketRef.current.disconnect();
+          socketRef.current = null;
+        }
       };
     }
   }, [buttonClicked]);
 
   const handleConnect = (steamId) => {
     steamIdRef.current = steamId;
-    const socket = io(endpoint);
-    socket.emit('connect_with_steamid', { steamid: steamId });
     setButtonClicked(true);
   };
 
   const handleDisconnect = () => {
-    // Emit 'disconnect_with_steamid' event when disconnecting
-    const socket = io(endpoint);
-    socket.emit('disconnect_with_steamid', { steamid: steamIdRef.current });
-    
+    if (socketRef.current) {
+      socketRef.current.emit('disconnect_with_steamid', { steamid: steamIdRef.current });
+    }
     setButtonClicked(false);
     setServerResponse(null);
   };
