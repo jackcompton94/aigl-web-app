@@ -4,9 +4,9 @@ import io from 'socket.io-client';
 const useSocket = (endpoint) => {
   const [serverResponse, setServerResponse] = useState(null);
   const [buttonClicked, setButtonClicked] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
   const steamIdRef = useRef('');
   const socketRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     if (buttonClicked) {
@@ -16,13 +16,16 @@ const useSocket = (endpoint) => {
 
         // Event handler for when the connection is established
         socketRef.current.on('connect', () => {
-          console.log('Connected to the server');
+          console.log('Connecting to the server...');
           socketRef.current.emit('connect_with_steamid', { steamid: steamIdRef.current });
-          setIsConnected(true);
+
+          // Clear the timeout and start a new one when the connection is established
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = setTimeout(handleAutoDisconnect, 1000); // Auto disconnect after 30 seconds of inactivity
         });
 
-        // Event handler for the 'connected' event from the server
-        socketRef.current.on('connected', (data) => {
+        // Event handler for the 'connect_with_steamid' event from the server
+        socketRef.current.on('connect_with_steamid', (data) => {
           console.log('Server says:', data.message);
           setServerResponse(data.message);
         });
@@ -31,19 +34,15 @@ const useSocket = (endpoint) => {
         socketRef.current.on('game_state_update', (data) => {
           console.log('Game state update:', data);
           setServerResponse(data); 
-        });
 
-        // Event handler for 'disconnect_with_steamid'
-        socketRef.current.on('disconnect_with_steamid', () => {
-          console.log('Disconnecting with SteamID');
-          setIsConnected(false);
-          // Perform any additional cleanup or actions if needed
+          // Reset the timeout on receiving any server response
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = setTimeout(handleAutoDisconnect, 1000); // Reset the timeout
         });
 
         // Event handler for when the connection is closed
         socketRef.current.on('disconnect', () => {
           console.log('Disconnected from the server');
-          setIsConnected(false);
         });
       }
 
@@ -53,6 +52,7 @@ const useSocket = (endpoint) => {
           socketRef.current.disconnect();
           socketRef.current = null;
         }
+        clearTimeout(timeoutRef.current); // Clear the timeout on component unmount
       };
     }
   }, [buttonClicked]);
@@ -68,12 +68,18 @@ const useSocket = (endpoint) => {
     }
     setButtonClicked(false);
     setServerResponse(null);
+    clearTimeout(timeoutRef.current); // Clear the timeout when disconnecting manually
+  };
+
+  // Function to handle auto disconnection
+  const handleAutoDisconnect = () => {
+    // TODO: Fix the bug where this doesnt actually disconnect from the client
+    handleDisconnect();
   };
 
   return {
     serverResponse,
     buttonClicked,
-    isConnected,
     handleConnect,
     handleDisconnect,
   };

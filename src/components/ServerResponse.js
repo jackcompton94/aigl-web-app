@@ -21,7 +21,7 @@ function ServerResponse({ response }) {
         if (index === response.length) {
           clearInterval(typingInterval);
         }
-      }, 10); // Adjust typing speed as needed
+      }, 10); // Adjusts typing speed
     }
   }, [response]);
 
